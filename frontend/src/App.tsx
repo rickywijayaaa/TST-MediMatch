@@ -3,7 +3,7 @@ import { BrowserRouter as Router, Routes, Route, useLocation } from "react-route
 import Navbar from "./components/Navbar";
 import LoginPage from "./components/LoginPage"; // Import your LoginPage component
 import HomePage from "./components/HeroSection"; // Example Home Page
-import Home from "./components/Homepage"; // Example Home Page
+import Home from "./components/HomePage"; // Example Home Page
 
 const App: React.FC = () => {
   const location = useLocation();
