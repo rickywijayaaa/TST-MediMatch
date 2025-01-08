@@ -15,7 +15,7 @@ const HomePage: React.FC = () => {
 
     try {
       // Send POST request to the backend `/recommend` endpoint
-      const response = await axios.post("http://127.0.0.1:8000/recommend", {
+      const response = await axios.post("http://backend.medimatch.web.id/recommend", {
         drug_name: searchTerm,
         top_n: topN,
       });
