@@ -4,16 +4,8 @@ from fastapi.responses import JSONResponse
 from pydantic import BaseModel
 import secrets
 import string
-from fastapi.responses import JSONResponse
-from pydantic import BaseModel
 from typing import Optional
 from app.predict import predict_alternative_medicine
-from jose import JWTError, jwt
-import secrets
-import string
-from datetime import datetime, timedelta
-from fastapi.middleware.trustedhost import TrustedHostMiddleware
-
 
 app = FastAPI()
 
@@ -41,8 +33,6 @@ api_keys_db = {}
 # Model for generating API key requests
 class ApiKeyRequest(BaseModel):
     email: str
-    application_name: str
-    organization: str
     phone: str
 
 # Function to generate a secure API key

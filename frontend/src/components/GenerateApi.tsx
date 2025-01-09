@@ -4,6 +4,7 @@ import { useNavigate } from "react-router-dom";
 const GenerateApi: React.FC = () => {
   const [email, setEmail] = useState<string>(""); // Email input state
   const [phone, setPhone] = useState<string>(""); // Phone input state
+  const [apiKey, setApiKey] = useState<string | null>(null); // API Key state
   const [error, setError] = useState<string>(""); // Error message state
   const [isLoading, setIsLoading] = useState<boolean>(false); // Loading state
 
@@ -11,6 +12,7 @@ const GenerateApi: React.FC = () => {
 
   const handleGenerateApiKey = async () => {
     setError("");
+    setApiKey(null);
 
     if (!email || !phone) {
       setError("Both email and phone number are required!");
@@ -37,13 +39,17 @@ const GenerateApi: React.FC = () => {
         throw new Error(errorData.detail || "Failed to generate API key. Please try again.");
       }
 
-      // Redirect to homepage upon successful API key generation
-      navigate("/home");
+      const data = await response.json();
+      setApiKey(data.api_key); // Set the generated API key
     } catch (err: any) {
       setError(err.message || "An unexpected error occurred.");
     } finally {
       setIsLoading(false);
     }
+  };
+
+  const handleContinue = () => {
+    navigate("/home"); // Redirect to homepage
   };
 
   return (
@@ -60,50 +66,70 @@ const GenerateApi: React.FC = () => {
           <div className="text-red-500 text-center mb-4">{error}</div>
         )}
 
-        <form
-          onSubmit={(e) => {
-            e.preventDefault();
-            handleGenerateApiKey();
-          }}
-        >
-          <div className="mb-4">
-            <label htmlFor="email" className="block text-gray-700 mb-2">
-              Email
-            </label>
-            <input
-              type="email"
-              id="email"
-              value={email}
-              onChange={(e) => setEmail(e.target.value)}
-              className="w-full px-4 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-primary"
-              placeholder="Enter your email"
-              required
-              disabled={isLoading}
-            />
+        {apiKey ? (
+          // Popup-like display for the API key
+          <div className="text-center">
+            <div className="bg-green-50 border border-green-400 text-green-700 p-4 rounded-lg mb-4">
+              <h2 className="text-lg font-bold">Your API Key</h2>
+              <p className="text-sm mt-2 break-all">{apiKey}</p>
+              <p className="text-xs text-gray-600 mt-4">
+                Keep your API key secure. Do not share it publicly.
+              </p>
+            </div>
+            <button
+              onClick={handleContinue}
+              className="bg-primary text-white py-2 px-4 rounded-lg hover:bg-red-600 transition duration-300"
+            >
+              Continue
+            </button>
           </div>
-          <div className="mb-6">
-            <label htmlFor="phone" className="block text-gray-700 mb-2">
-              Phone Number
-            </label>
-            <input
-              type="text"
-              id="phone"
-              value={phone}
-              onChange={(e) => setPhone(e.target.value)}
-              className="w-full px-4 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-primary"
-              placeholder="Enter your phone number"
-              required
-              disabled={isLoading}
-            />
-          </div>
-          <button
-            type="submit"
-            className="w-full bg-primary text-white py-2 rounded-lg hover:bg-red-600 transition duration-300 disabled:opacity-50 disabled:cursor-not-allowed"
-            disabled={isLoading}
+        ) : (
+          // Form for generating API key
+          <form
+            onSubmit={(e) => {
+              e.preventDefault();
+              handleGenerateApiKey();
+            }}
           >
-            {isLoading ? "Generating..." : "Generate API Key"}
-          </button>
-        </form>
+            <div className="mb-4">
+              <label htmlFor="email" className="block text-gray-700 mb-2">
+                Email
+              </label>
+              <input
+                type="email"
+                id="email"
+                value={email}
+                onChange={(e) => setEmail(e.target.value)}
+                className="w-full px-4 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-primary"
+                placeholder="Enter your email"
+                required
+                disabled={isLoading}
+              />
+            </div>
+            <div className="mb-6">
+              <label htmlFor="phone" className="block text-gray-700 mb-2">
+                Phone Number
+              </label>
+              <input
+                type="text"
+                id="phone"
+                value={phone}
+                onChange={(e) => setPhone(e.target.value)}
+                className="w-full px-4 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-primary"
+                placeholder="Enter your phone number"
+                required
+                disabled={isLoading}
+              />
+            </div>
+            <button
+              type="submit"
+              className="w-full bg-primary text-white py-2 rounded-lg hover:bg-red-600 transition duration-300 disabled:opacity-50 disabled:cursor-not-allowed"
+              disabled={isLoading}
+            >
+              {isLoading ? "Generating..." : "Generate API Key"}
+            </button>
+          </form>
+        )}
       </div>
     </div>
   );
