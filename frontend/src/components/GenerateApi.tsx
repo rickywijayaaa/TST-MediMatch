@@ -1,5 +1,7 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
+import { auth } from "../../firebase"; // Firebase auth import
+import { onAuthStateChanged } from "firebase/auth";
 
 const GenerateApi: React.FC = () => {
   const [email, setEmail] = useState<string>(""); // Email input state
@@ -9,6 +11,17 @@ const GenerateApi: React.FC = () => {
   const [isLoading, setIsLoading] = useState<boolean>(false); // Loading state
 
   const navigate = useNavigate(); // React Router navigation
+
+  useEffect(() => {
+    // Check if the user is logged in and set the email
+    const unsubscribe = onAuthStateChanged(auth, (user) => {
+      if (user && user.email) {
+        setEmail(user.email); // Auto-fill the email field
+      }
+    });
+
+    return () => unsubscribe(); // Cleanup subscription on unmount
+  }, []);
 
   const handleGenerateApiKey = async () => {
     setError("");
@@ -103,7 +116,7 @@ const GenerateApi: React.FC = () => {
                 className="w-full px-4 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-primary"
                 placeholder="Enter your email"
                 required
-                disabled={isLoading}
+                disabled={true} // Disable email input since it's auto-filled
               />
             </div>
             <div className="mb-6">
