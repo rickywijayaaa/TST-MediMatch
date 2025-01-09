@@ -1,4 +1,5 @@
 import React, { useState } from "react";
+import { useNavigate } from "react-router-dom"; // Import useNavigate for navigation
 import axios from "axios";
 import logo from "../assets/logo.png";
 
@@ -16,6 +17,8 @@ const HomePage: React.FC = () => {
   const [error, setError] = useState<string>("");
   const [isLoading, setIsLoading] = useState<boolean>(false);
 
+  const navigate = useNavigate(); // Initialize the navigate function
+
   const handleSearch = async (e: React.FormEvent) => {
     e.preventDefault();
     setError("");
@@ -31,10 +34,8 @@ const HomePage: React.FC = () => {
         },
         {
           headers: {
-            'Content-Type': 'application/json',
+            "Content-Type": "application/json",
           },
-          // withCredentials: true,
-          // Adding a timeout of 15 seconds
           timeout: 15000,
         }
       );
@@ -50,49 +51,73 @@ const HomePage: React.FC = () => {
       setResults(transformedResults);
     } catch (err: any) {
       if (axios.isAxiosError(err)) {
-        if (err.code === 'ECONNABORTED') {
-          setError('Request timed out. Please try again.');
+        if (err.code === "ECONNABORTED") {
+          setError("Request timed out. Please try again.");
         } else if (err.response) {
-          // Server responded with error
-          setError(err.response.data?.detail || 'Server error occurred.');
+          setError(err.response.data?.detail || "Server error occurred.");
         } else if (err.request) {
-          // Request made but no response
-          setError('No response from server. Please check your connection.');
+          setError("No response from server. Please check your connection.");
         } else {
-          setError('Failed to make request. Please try again.');
+          setError("Failed to make request. Please try again.");
         }
       } else {
-        setError('An unexpected error occurred.');
+        setError("An unexpected error occurred.");
       }
-      console.error('Search error:', err);
+      console.error("Search error:", err);
     } finally {
       setIsLoading(false);
     }
   };
 
+  const handleDeveloperModeClick = () => {
+    navigate("/generate-api"); // Navigate to the GenerateApi page
+  };
+
   return (
     <div className="flex min-h-screen bg-white">
-      {/* Left-Side Navigation Bar with Vertical Line */}
-      <div className="w-1/6 bg-gray-100 p-6 flex flex-col border-r border-gray-300">
-        <div className="flex items-center mb-10 pb-4 border-b border-gray-300">
-          <img src={logo} alt="Logo" className="h-10 mr-2" />
+      {/* Left-Side Navigation Bar */}
+      <div className="w-1/6 bg-gray-100 p-6 flex flex-col border-r border-gray-300 justify-between">
+        {/* Top Section */}
+        <div>
+          <div className="flex items-center mb-10 pb-4 border-b border-gray-300">
+            <img src={logo} alt="Logo" className="h-10 mr-2" />
+          </div>
+          <div className="mb-8">
+            <h2 className="text-gray-500 text-sm uppercase mb-4">
+              Drugs Recommendation
+            </h2>
+            <ul className="space-y-2">
+              <li>
+                <a
+                  href="#"
+                  className="text-gray-800 hover:text-primary flex items-center"
+                >
+                  <span className="material-icons-outlined mr-2">
+                    Drugs Feature
+                  </span>
+                </a>
+              </li>
+              <li>
+                <a
+                  href="#"
+                  className="text-gray-800 hover:text-primary flex items-center"
+                >
+                  <span className="material-icons-outlined mr-2">
+                    Find Place
+                  </span>
+                </a>
+              </li>
+            </ul>
+          </div>
         </div>
 
-        <div className="mb-8">
-          <h2 className="text-gray-500 text-sm uppercase mb-4">Drugs Recommendation</h2>
-          <ul className="space-y-2">
-            <li>
-              <a href="#" className="text-gray-800 hover:text-primary flex items-center">
-                <span className="material-icons-outlined mr-2">Drugs Feature</span>
-              </a>
-            </li>
-            <li>
-              <a href="#" className="text-gray-800 hover:text-primary flex items-center">
-                <span className="material-icons-outlined mr-2">Find Place</span>
-              </a>
-            </li>
-          </ul>
-        </div>
+        {/* Bottom Section with Developer Mode Button */}
+        <button
+          onClick={handleDeveloperModeClick} // Navigate to GenerateApi page
+          className="bg-primary text-white py-2 px-4 rounded-lg hover:bg-red-600 transition duration-300 w-full"
+        >
+          Developer Mode
+        </button>
       </div>
 
       {/* Main Content */}
@@ -142,7 +167,7 @@ const HomePage: React.FC = () => {
             className="w-full bg-primary text-white py-2 rounded-lg hover:bg-red-600 transition duration-300 disabled:opacity-50 disabled:cursor-not-allowed"
             disabled={isLoading}
           >
-            {isLoading ? 'Searching...' : 'Search'}
+            {isLoading ? "Searching..." : "Search"}
           </button>
         </form>
 
@@ -156,7 +181,10 @@ const HomePage: React.FC = () => {
           {results.length > 0 ? (
             <ul className="bg-white shadow-lg rounded-lg p-4">
               {results.map((result) => (
-                <li key={result.id} className="text-gray-900 py-4 border-b last:border-b-0">
+                <li
+                  key={result.id}
+                  className="text-gray-900 py-4 border-b last:border-b-0"
+                >
                   <p className="font-bold">{result.medicine}</p>
                   <p className="text-gray-600">{result.composition}</p>
                 </li>
