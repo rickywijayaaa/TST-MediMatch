@@ -116,7 +116,7 @@ const HomePage: React.FC = () => {
               value={searchTerm}
               onChange={(e) => setSearchTerm(e.target.value)}
               className="w-full px-4 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-primary"
-              placeholder="Enter medicine name"
+              placeholder="Enter medicine name (Aspirin, Paracetamol, Rhinos)"
               required
               disabled={isLoading}
             />
