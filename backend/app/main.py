@@ -4,6 +4,16 @@ from fastapi.responses import JSONResponse
 from pydantic import BaseModel
 import secrets
 import string
+from fastapi.responses import JSONResponse
+from pydantic import BaseModel
+from typing import Optional
+from app.predict import predict_alternative_medicine
+from jose import JWTError, jwt
+import secrets
+import string
+from datetime import datetime, timedelta
+from fastapi.middleware.trustedhost import TrustedHostMiddleware
+
 
 app = FastAPI()
 
@@ -59,9 +69,7 @@ async def generate_api_key_endpoint(request: ApiKeyRequest):
         # Store the API key in the database (in-memory for now)
         api_keys_db[request.email] = {
             "api_key": api_key,
-            "application_name": request.application_name,
-            "organization": request.organization,
-            "phone": request.phone,
+            "phone": request.phone
         }
 
         # Return the generated API key
