@@ -2,7 +2,7 @@ import axios from "axios";
 
 // Create an Axios instance with a base URL
 const axiosInstance = axios.create({
-    baseURL: "http://backend.medimatch.web.id", // Base URL for your backend
+    baseURL: "https://backend.medimatch.web.id", // Base URL for your backend
     headers: {
         "Content-Type": "application/json", // Default headers for JSON requests
     },

@@ -1,42 +1,72 @@
 import React, { useState } from "react";
-import axios from "axios"; // Import Axios for API requests
-import logo from "../assets/logo.png"; // Import the logo
+import axios from "axios";
+import logo from "../assets/logo.png";
+
+// Define type for API response
+interface DrugResult {
+  id: string;
+  medicine: string;
+  composition: string;
+}
 
 const HomePage: React.FC = () => {
-  const [searchTerm, setSearchTerm] = useState<string>(""); // State for search input
-  const [topN, setTopN] = useState<number>(5); // Number of recommendations
-  const [results, setResults] = useState<any[]>([]); // State for API results
-  const [error, setError] = useState<string>(""); // State for error messages
+  const [searchTerm, setSearchTerm] = useState<string>("");
+  const [topN, setTopN] = useState<number>(5);
+  const [results, setResults] = useState<DrugResult[]>([]);
+  const [error, setError] = useState<string>("");
+  const [isLoading, setIsLoading] = useState<boolean>(false);
 
   const handleSearch = async (e: React.FormEvent) => {
     e.preventDefault();
     setError("");
     setResults([]);
+    setIsLoading(true);
 
     try {
-      // Send POST request to the backend `/recommend` endpoint
-      const response = await axios.post("http://backend.medimatch.web.id/recommend", {
-        drug_name: searchTerm,
-        top_n: topN,
-      });
+      const response = await axios.post(
+        "https://backend.medimatch.web.id/recommend",
+        {
+          drug_name: searchTerm,
+          top_n: topN,
+        },
+        {
+          headers: {
+            'Content-Type': 'application/json',
+          },
+          // withCredentials: true,
+          // Adding a timeout of 15 seconds
+          timeout: 15000,
+        }
+      );
 
-      // Parse the response to extract names and compositions
       const { name, combined_composition } = response.data.data;
 
-      // Transform the data into a list of objects for easy rendering
       const transformedResults = Object.keys(name).map((key) => ({
         id: key,
         medicine: name[key],
         composition: combined_composition[key],
       }));
 
-      setResults(transformedResults); // Update results with transformed data
+      setResults(transformedResults);
     } catch (err: any) {
-      if (err.response && err.response.data) {
-        setError(err.response.data.detail || "Something went wrong");
+      if (axios.isAxiosError(err)) {
+        if (err.code === 'ECONNABORTED') {
+          setError('Request timed out. Please try again.');
+        } else if (err.response) {
+          // Server responded with error
+          setError(err.response.data?.detail || 'Server error occurred.');
+        } else if (err.request) {
+          // Request made but no response
+          setError('No response from server. Please check your connection.');
+        } else {
+          setError('Failed to make request. Please try again.');
+        }
       } else {
-        setError("Failed to fetch recommendations. Please try again.");
+        setError('An unexpected error occurred.');
       }
+      console.error('Search error:', err);
+    } finally {
+      setIsLoading(false);
     }
   };
 
@@ -44,12 +74,10 @@ const HomePage: React.FC = () => {
     <div className="flex min-h-screen bg-white">
       {/* Left-Side Navigation Bar with Vertical Line */}
       <div className="w-1/6 bg-gray-100 p-6 flex flex-col border-r border-gray-300">
-        {/* Logo Section with Grey Line */}
         <div className="flex items-center mb-10 pb-4 border-b border-gray-300">
           <img src={logo} alt="Logo" className="h-10 mr-2" />
         </div>
 
-        {/* Navigation Sections */}
         <div className="mb-8">
           <h2 className="text-gray-500 text-sm uppercase mb-4">Drugs Recommendation</h2>
           <ul className="space-y-2">
@@ -90,6 +118,7 @@ const HomePage: React.FC = () => {
               className="w-full px-4 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-primary"
               placeholder="Enter medicine name"
               required
+              disabled={isLoading}
             />
           </div>
           <div>
@@ -105,32 +134,39 @@ const HomePage: React.FC = () => {
               placeholder="Enter number of alternatives"
               min={1}
               required
+              disabled={isLoading}
             />
           </div>
           <button
             type="submit"
-            className="w-full bg-primary text-white py-2 rounded-lg hover:bg-red-600 transition duration-300"
+            className="w-full bg-primary text-white py-2 rounded-lg hover:bg-red-600 transition duration-300 disabled:opacity-50 disabled:cursor-not-allowed"
+            disabled={isLoading}
           >
-            Search
+            {isLoading ? 'Searching...' : 'Search'}
           </button>
         </form>
 
         {/* Search Results */}
         <div className="mt-6 w-full max-w-lg">
-          {error && <p className="text-red-500 text-center">{error}</p>}
+          {error && (
+            <p className="text-red-500 text-center p-4 bg-red-50 rounded-lg">
+              {error}
+            </p>
+          )}
           {results.length > 0 ? (
             <ul className="bg-white shadow-lg rounded-lg p-4">
               {results.map((result) => (
                 <li key={result.id} className="text-gray-900 py-4 border-b last:border-b-0">
                   <p className="font-bold">{result.medicine}</p>
-                  <p>{result.composition}</p>
+                  <p className="text-gray-600">{result.composition}</p>
                 </li>
               ))}
             </ul>
           ) : (
             searchTerm &&
-            !error && (
-              <p className="text-grayText text-center mt-4">
+            !error &&
+            !isLoading && (
+              <p className="text-gray-500 text-center mt-4 p-4 bg-gray-50 rounded-lg">
                 No drugs found matching "{searchTerm}".
               </p>
             )
