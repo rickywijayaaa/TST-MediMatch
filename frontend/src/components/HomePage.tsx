@@ -70,7 +70,7 @@ const HomePage: React.FC = () => {
       {/* Main Content */}
       <div className="flex-1 flex flex-col items-center justify-center p-8">
         <h1 className="text-4xl font-bold text-gray-900 mb-6 text-center">
-          Welcome to Arvyno
+          Welcome to Medimatch
         </h1>
         <p className="text-lg text-grayText mb-8 text-center">
           Find the best drugs and medications tailored for your needs.

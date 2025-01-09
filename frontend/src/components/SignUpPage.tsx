@@ -1,69 +1,50 @@
 import React, { useState } from "react";
-import { useNavigate } from "react-router-dom";
-import logo from "../assets/logo.png";
-import google from "../assets/google.png";
-import {
-  auth,
-  googleProvider,
-  signInWithPopup,
-  signInWithEmailAndPassword,
-} from "../../firebase"; // Import Firebase setup
+import { useNavigate } from "react-router-dom"; // Import useNavigate
+import logo from "../assets/logo.png"; // MediMatch logo
+import { auth, createUserWithEmailAndPassword } from "../../firebase"; // Firebase setup
 
-const LoginPage: React.FC = () => {
+const SignUpPage: React.FC = () => {
+  const [name, setName] = useState<string>(""); // State for name input
   const [email, setEmail] = useState<string>(""); // State for email input
   const [password, setPassword] = useState<string>(""); // State for password input
   const [showPopup, setShowPopup] = useState<boolean>(false); // State for popup visibility
   const [popupMessage, setPopupMessage] = useState<string>(""); // Popup message
   const [isSuccess, setIsSuccess] = useState<boolean>(false); // Success or failure popup
-  const navigate = useNavigate();
+  const navigate = useNavigate(); // Initialize useNavigate
 
-  const handleGoogleSignIn = async () => {
+  const handleSignUp = async (e: React.FormEvent) => {
+    e.preventDefault(); // Prevent default form submission
+
     try {
-      const result = await signInWithPopup(auth, googleProvider);
-      console.log("Google Sign-In successful:", result.user);
-      setPopupMessage("Login Successful! Redirecting to your homepage...");
+      // Create a new user with email and password in Firebase
+      const result = await createUserWithEmailAndPassword(auth, email, password);
+      console.log("User signed up:", result.user);
+
+      // Mock saving additional user info (e.g., name) to Firestore
+      console.log("Saving additional user info:", { name });
+
+      setPopupMessage("Sign-Up Successful! Redirecting to your homepage...");
       setIsSuccess(true);
       setShowPopup(true);
       setTimeout(() => {
         setShowPopup(false);
-        navigate("/home");
+        navigate("/home"); // Navigate to the homepage route
       }, 2500);
-    } catch (error) {
-      console.error("Google Sign-In failed:", error);
-      setPopupMessage("Google Sign-In failed. Please try again.");
+    } catch (error: any) {
+      console.error("Sign-Up failed:", error);
+
+      // Check error code for email already in use
+      if (error.code === "auth/email-already-in-use") {
+        setPopupMessage("Email is already registered. Please try logging in.");
+      } else {
+        setPopupMessage("Sign-Up failed. Please try again.");
+      }
       setIsSuccess(false);
       setShowPopup(true);
       setTimeout(() => {
         setShowPopup(false);
       }, 2500);
     }
-  };
-
-  const handleLogin = async (e: React.FormEvent) => {
-    e.preventDefault();
-    try {
-      const result = await signInWithEmailAndPassword(auth, email, password);
-      console.log("Login successful:", result.user);
-      setPopupMessage("Login Successful! Redirecting to your homepage...");
-      setIsSuccess(true);
-      setShowPopup(true);
-      setTimeout(() => {
-        setShowPopup(false);
-        navigate("/home");
-      }, 2500);
-    } catch (error) {
-      console.error("Login failed:", error);
-      setPopupMessage("Login failed. Please check your email and password.");
-      setIsSuccess(false);
-      setShowPopup(true);
-      setTimeout(() => {
-        setShowPopup(false);
-      }, 2500);
-    }
-  };
-
-  const handleSignUpNavigation = () => {
-    navigate("/signup");
   };
 
   return (
@@ -89,7 +70,24 @@ const LoginPage: React.FC = () => {
           <img src={logo} alt="MediMatch Logo" className="h-12" />
         </div>
 
-        <form onSubmit={handleLogin}>
+        <form onSubmit={handleSignUp}>
+          {/* Name Input */}
+          <div className="mb-4">
+            <label htmlFor="name" className="block text-grayText mb-2">
+              Name
+            </label>
+            <input
+              type="text"
+              id="name"
+              value={name}
+              onChange={(e) => setName(e.target.value)}
+              className="w-full px-4 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-primary"
+              placeholder="Enter your name"
+              required
+            />
+          </div>
+
+          {/* Email Input */}
           <div className="mb-4">
             <label htmlFor="email" className="block text-grayText mb-2">
               Email Address
@@ -105,6 +103,7 @@ const LoginPage: React.FC = () => {
             />
           </div>
 
+          {/* Password Input */}
           <div className="mb-6">
             <label htmlFor="password" className="block text-grayText mb-2">
               Password
@@ -124,26 +123,14 @@ const LoginPage: React.FC = () => {
             type="submit"
             className="w-full bg-primary text-white py-2 rounded-lg hover:bg-red-600 transition duration-200"
           >
-            Login
-          </button>
-
-          <button
-            type="button"
-            onClick={handleGoogleSignIn}
-            className="w-full mt-4 bg-white text-black py-2 rounded-lg flex items-center justify-center border border-gray-300 hover:bg-gray-800 hover:text-white transition duration-200"
-          >
-            <img src={google} alt="Google Logo" className="h-5 mr-2" />
-            Sign in with Google
+            Sign Up
           </button>
 
           <p className="text-grayText text-center mt-4">
-            Don&apos;t have an account?{" "}
-            <span
-              onClick={handleSignUpNavigation}
-              className="text-primary underline cursor-pointer"
-            >
-              Sign Up
-            </span>
+            Already have an account?{" "}
+            <a href="/login" className="text-primary underline">
+              Login
+            </a>
           </p>
         </form>
       </div>
@@ -151,4 +138,4 @@ const LoginPage: React.FC = () => {
   );
 };
 
-export default LoginPage;
+export default SignUpPage;
