@@ -28,7 +28,7 @@ const BookConsultation: React.FC = () => {
           headers: {
             "Authorization": `Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiJmaXJzYSIsImV4cCI6MTc2ODA0NDgwMH0.saIjnJQPtNxGopy-cLuTKfotHLnDd8J33DEDiOyc2r0`, // Replace with a valid token
             "Content-Type": "application/json",
-          },
+          },    
         }
       );
 

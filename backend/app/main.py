@@ -12,6 +12,10 @@ from fastapi import Header, HTTPException, Request
 import secrets
 import httpx
 from typing import Any
+from fastapi import FastAPI, HTTPException
+from fastapi.responses import FileResponse
+from fastapi.middleware.cors import CORSMiddleware
+from fastapi.staticfiles import StaticFiles
 
 
 
@@ -237,9 +241,24 @@ async def create_payment():
         raise HTTPException(status_code=500, detail=f"Failed to create payment: {str(e)}")
 
 
+
+
+
+from fastapi.openapi.utils import get_openapi
+from fastapi.responses import HTMLResponse
+import json
+
+
+# Mount the static files directory
+STATIC_DIR = os.path.join(os.path.dirname(__file__), "static")
+app.mount("/static", StaticFiles(directory=STATIC_DIR), name="static")
+
 @app.get("/")
-async def health_check():
+async def serve_documentation():
     """
-    Health check endpoint to verify the server is running.
+    Serve the documentation.html file as the default route.
     """
-    return {"status": "Server is running"}
+    doc_file_path = os.path.join(STATIC_DIR, "documentation.html")
+    if os.path.exists(doc_file_path):
+        return FileResponse(doc_file_path)
+    raise HTTPException(status_code=404, detail="Documentation file not found")

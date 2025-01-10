@@ -1,0 +1,181 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Medimatch API Documentation</title>
+    <style>
+        body { font-family: Arial, sans-serif; margin: 0; padding: 0; background-color: #f9fafc; color: #333; }
+        header { background-color: #9b3d7f; color: white; padding: 20px; text-align: center; }
+        .container { padding: 20px; max-width: 1200px; margin: 0 auto; }
+        .section { margin-bottom: 40px; }
+        .endpoint { margin-bottom: 30px; }
+        .endpoint h3 { margin: 0; color: #9b3d7f; font-size: 20px; }
+        .description { margin-bottom: 10px; }
+        pre { background-color: #f4f4f9; padding: 15px; border-radius: 5px; border: 1px solid #ddd; }
+        code { font-size: 14px; color: #070607; }
+        .example { margin-top: 10px; color: #333; }
+        .section h2 { color: #333; margin-bottom: 20px; }
+        .example-title { font-weight: bold; margin-bottom: 5px; }
+    </style>
+</head>
+<body>
+    <header>
+        <h1>Medimatch API Documentation</h1>
+        <p>A comprehensive guide to Medimatch API endpoints, request formats, and response structures.</p>
+    </header>
+    <div class="container">
+
+        <!-- Secure Endpoints Section -->
+        <div class="section">
+            <h1>Secure Endpoints</h1>
+
+            <!-- /recommend Endpoint -->
+            <div class="endpoint">
+                <h3>POST /recommend</h3>
+                <p class="description">
+                    This endpoint is the core of Medimatch's business, allowing prediction of alternative medicines based on composition and functionality.
+                </p>
+                <strong>Request Body:</strong>
+                <pre><code>{
+  "drug_name": "Aspirin",
+  "top_n": 5
+}</code></pre>
+                <strong>Response:</strong>
+                <pre><code>
+{"success": true,
+  "data": {
+    "name": {
+      "7674": "Augcef-CV Tablet",
+      "20326": "Amclion 500mg/125mg Tablet",
+      "68656": "Dawclav 500mg/125mg Tablet",
+      "114383": "Jesclav 625 Tablet",
+      "136808": "Moxsen-CV 625 Tablet"
+    },
+    "combined_composition": {
+      "7674": "Amoxycillin  (500mg)    Clavulanic Acid (125mg)",
+      "20326": "Amoxycillin  (500mg)    Clavulanic Acid (125mg)",
+      "68656": "Amoxycillin  (500mg)    Clavulanic Acid (125mg)",
+      "114383": "Amoxycillin  (500mg)    Clavulanic Acid (125mg)",
+      "136808": "Amoxycillin  (500mg)    Clavulanic Acid (125mg)"
+    }
+  }
+}</code></pre>
+                <div class="example">
+                    <p class="example-title">Example Request:</p>
+                    <pre><code>curl -X POST https://backend.medimatch.web.id/recommend \
+-H "Content-Type: application/json" \
+-H "X-API-Key: YOUR_API_KEY" \
+-d '{"drug_name":"Aspirin","top_n":5}'</code></pre>
+                </div>
+            </div>
+
+            <!-- /payment Endpoint -->
+            <div class="endpoint">
+                <h3>POST /payment</h3>
+                <p class="description">
+                    This endpoint integrates with an external service to generate QR codes and process payments using Solana cryptocurrency.
+                </p>
+                <strong>Request Body:</strong>
+                <pre><code>{}</code></pre>
+                <strong>Response:</strong>
+                <pre><code>{
+  "status": "success",
+  "message": "Payment created",
+  "paymentData": {
+    "id": "abc123",
+    "qr_code": "https://example.com/qrcode",
+    "amount": 0.03,
+    "currency": "SOL"
+  }
+}</code></pre>
+                <div class="example">
+                    <p class="example-title">Example Request:</p>
+                    <pre><code>curl -X POST https://backend.medimatch.web.id/payment \
+-H "Content-Type: application/json" \
+-H "x-api-key: YOUR_API_KEY" \
+-d '{}'</code></pre>
+                </div>
+            </div>
+
+            <!-- /reservation Endpoint -->
+            <div class="endpoint">
+                <h3>POST /reservation</h3>
+                <p class="description">
+                    This endpoint integrates with an external service to book a consultation seat.
+                </p>
+                <strong>Request Body:</strong>
+                <pre><code>{
+  "seat_number": "A12",
+  "reservation_date": "2025-03-01"
+}</code></pre>
+                <strong>Response:</strong>
+                <pre><code>
+{
+  "id": 34,
+  "user_name": "faiz",
+  "seat_number": "A12",
+  "reservation_date": "2025-03-01",
+  "created_at": "2025-01-10T12:23:38.979095"
+}</code></pre>
+                <div class="example">
+                    <p class="example-title">Example Request:</p>
+                    <pre><code>curl -X POST https://backend.medimatch.web.id/reservation \
+-H "Content-Type: application/json" \
+-H "Authorization: Bearer YOUR_ACCESS_TOKEN" \
+-d '{"seat_number":"A12","reservation_date":"2025-01-10"}'</code></pre>
+                </div>
+            </div>
+        </div>
+
+        <!-- Public Endpoints Section -->
+        <div class="section">
+            <h1>Public Endpoints</h1>
+
+            <!-- /generate-api-key Endpoint -->
+            <div class="endpoint">
+                <h3>POST /generate-api-key</h3>
+                <p class="description">
+                    This endpoint generates an API key for developers who want to use Medimatch services.
+                </p>
+                <strong>Request Body:</strong>
+                <pre><code>{
+  "email": "developer@example.com",
+  "phone": "0818000000"
+}</code></pre>
+                <strong>Response:</strong>
+                <pre><code>{
+  "success": true,
+  "api_key": "abcd1234efgh5678ijkl9012mnop3456"
+}</code></pre>
+                <div class="example">
+                    <p class="example-title">Example Request:</p>
+                    <pre><code>curl -X POST https://backend.medimatch.web.id/generate-api-key \
+-H "Content-Type: application/json" \
+-d '{"email":"developer@example.com","phone":"0818000000"}'</code></pre>
+                </div>
+            </div>
+
+            <!-- /api-keys Endpoint -->
+            <div class="endpoint">
+                <h3>GET /api-keys</h3>
+                <p class="description">
+                    This endpoint retrieves all existing API keys. No body is required.
+                </p>
+                <strong>Response:</strong>
+                <pre><code>{
+  "success": true,
+  "api_keys": [
+    { "id": 1, "email": "developer1@example.com", "api_key": "abcd1234" },
+    { "id": 2, "email": "developer2@example.com", "api_key": "efgh5678" }
+  ]
+}</code></pre>
+                <div class="example">
+                    <p class="example-title">Example Request:</p>
+                    <pre><code>curl -X GET https://backend.medimatch.web.id/api-keys</code></pre>
+                </div>
+            </div>
+        </div>
+    </div>
+</body>
+</html>
