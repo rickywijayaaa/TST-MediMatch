@@ -84,7 +84,7 @@ const HomePage: React.FC = () => {
         },
         {
           headers: {
-            "x-api-key": "304a903d-b8a3-4944-832b-153de7d954b2", // Your API Key
+            "x-api-key": "5fcd48e0-c8b2-455f-ba5e-2f41a9b3e534", // Your API Key
             "Content-Type": "application/json",
           },
         }
