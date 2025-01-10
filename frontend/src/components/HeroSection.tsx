@@ -1,7 +1,14 @@
 import React from "react";
+import { useNavigate } from "react-router-dom";
 import doctorImage from "../assets/doctor.png"; // Replace with your image path
 
 const HeroSection: React.FC = () => {
+  const navigate = useNavigate(); // Initialize navigate function
+
+  const handleStartFreeClick = () => {
+    navigate("/login"); // Redirect to login page
+  };
+
   return (
     <section className="flex flex-col-reverse md:flex-row items-center bg-white py-12 px-6">
       {/* Left Text Section */}
@@ -14,7 +21,10 @@ const HeroSection: React.FC = () => {
           Connect with certified doctors, manage prescriptions, and schedule appointments with ease.
         </p>
         <div className="flex justify-center md:justify-start">
-          <button className="bg-primary text-white w-64 py-4 text-xl font-bold rounded-md hover:bg-red-600 transition duration-300">
+          <button
+            className="bg-primary text-white w-64 py-4 text-xl font-bold rounded-md hover:bg-red-600 transition duration-300"
+            onClick={handleStartFreeClick}
+          >
             Started Free
           </button>
         </div>
