@@ -160,9 +160,12 @@ const HomePage: React.FC = () => {
                   href="#"
                   className="text-gray-800 hover:text-primary flex items-center"
                 >
-                  <span className="material-icons-outlined mr-2">
-                    Book Consultation
-                  </span>
+                <span
+                  className="material-icons-outlined mr-2 cursor-pointer text-gray-800 hover:text-red-600"
+                  onClick={() => navigate('/Book')}
+                >
+                  Book Consultation
+                </span>
                 </a>
               </li>
             </ul>

@@ -6,12 +6,14 @@ import SignUpPage from "./components/SignUpPage"; // Sign-Up Page Component
 import HeroSection from "./components/HeroSection"; // Hero Section Component
 import HomePage from "./components/HomePage"; // Home Page Component
 import GenerateApi from "./components/GenerateApi"; // Generate API Key Page Component
+import BookConsultation from "./components/BookConsultation";
+
 
 const App: React.FC = () => {
   const location = useLocation();
 
   // List of paths where Navbar should not be displayed
-  const hideNavbarPaths = ["/login", "/signup","/home"];
+  const hideNavbarPaths = ["/login", "/signup","/home","/Book","/hero","/generate-api"];
 
   return (
     <>
@@ -27,6 +29,7 @@ const App: React.FC = () => {
         <Route path="/home" element={<HomePage />} />
         <Route path="/hero" element={<HeroSection />} /> 
         <Route path="/generate-api" element={<GenerateApi />} />
+        <Route path="/Book" element={<BookConsultation />} />
       </Routes>
     </>
   );

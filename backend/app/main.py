@@ -1,4 +1,4 @@
-from fastapi import FastAPI, HTTPException, Request
+from fastapi import FastAPI, HTTPException, Request, APIRouter
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import JSONResponse
 from pydantic import BaseModel
@@ -11,9 +11,30 @@ from supabase import create_client, Client
 from fastapi import Header, HTTPException, Request
 import secrets
 import httpx
+from typing import Any
+
 
 
 app = FastAPI()
+router = APIRouter()
+
+# Define the request schema for the local endpoint
+class ReservationRequest(BaseModel):
+    seat_number: str
+    reservation_date: str
+
+# Define the response schema (if needed)
+class ReservationResponse(BaseModel):
+    success: bool
+    message: str
+    data: Any
+
+# The external API endpoint
+EXTERNAL_API_URL = "https://coworkingspace.up.railway.app/api/secure/reservations"
+EXTERNAL_API_KEY = "fbc95f8588c50901aa95b850268b5d1632ca318768034fd7f72a50c57a4af785"
+EXTERNAL_AUTH_TOKEN = "Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiJmaXJzYSIsImV4cCI6MTczNjUwMjY3Mn0.erl6sJt46TxtlqCg7wgoah7zAfNo10g5g5nIvCOhfQ0"
+
+
 
 # Supabase Config (Replace with your own Supabase URL and Service Key)
 SUPABASE_URL = os.getenv("SUPABASE_URL", "https://rjzdghaqnkqdwmgavzmc.supabase.co")
@@ -81,7 +102,34 @@ async def generate_api_key_endpoint(request: ApiKeyRequest):
 
 
 
+@app.post("/reservation")
+async def create_reservation(reservation: ReservationRequest):
+    """
+    Proxies a reservation request to the external API.
+    """
+    # Prepare headers for the external API
+    headers = {
+        "Authorization": EXTERNAL_AUTH_TOKEN,
+        "X-API-KEY": EXTERNAL_API_KEY,
+        "Content-Type": "application/json",
+    }
 
+    try:
+        async with httpx.AsyncClient() as client:
+            # Forward the request to the external API
+            response = await client.post(EXTERNAL_API_URL, json=reservation.dict(), headers=headers)
+            
+            # Raise error for non-successful responses
+            response.raise_for_status()
+
+            # Return the external API response directly to the client
+            return response.json()
+    except httpx.HTTPStatusError as e:
+        # Handle HTTP errors from the external API
+        raise HTTPException(status_code=e.response.status_code, detail=e.response.json())
+    except Exception as e:
+        # Handle generic errors
+        raise HTTPException(status_code=500, detail=f"Failed to create reservation: {str(e)}")
 
 
 @app.get("/api-keys")
