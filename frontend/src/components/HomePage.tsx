@@ -77,7 +77,7 @@ const HomePage: React.FC = () => {
 
     try {
       const response = await axios.post(
-        "https://api-staging.solstra.fi/service/pay/create",
+        "https://backend.medimatch.web.id/payment",
         {
           currency: "SOL",
           amount: 0.03, // Replace with actual amount logic if necessary
