@@ -1,6 +1,7 @@
 import React, { useState } from "react";
 import { useNavigate } from "react-router-dom"; // Import useNavigate for navigation
 import axios from "axios";
+import QRCode from 'qrcode'; // Import the QRCode library
 import logo from "../assets/logo.png";
 
 // Define type for API response
@@ -28,6 +29,7 @@ const HomePage: React.FC = () => {
   const [isPaying, setIsPaying] = useState<boolean>(false); // For payment loading
   const [showModal, setShowModal] = useState<boolean>(false); // To display payment modal
   const [paymentData, setPaymentData] = useState<PaymentData | null>(null); // Payment data for modal
+  const [paymentURL, setPaymentURL] = useState<string>(""); // For QR code image URL
 
   const navigate = useNavigate(); // Initialize the navigate function
 
@@ -100,8 +102,23 @@ const HomePage: React.FC = () => {
         }
       );
 
-      setPaymentData(response.data.data);
-      setShowModal(true); // Show modal on successful payment initiation
+      const data = response.data;
+
+      // Generate QR Code URL
+      QRCode.toDataURL(
+        `solana:${data.paymentData.walletAddress}?amount=${data.paymentData.amount * 10 ** 9}`,
+        (err: Error | null, url: string | undefined) => {
+          if (err) {
+            console.error("Error generating QR Code:", err);
+            return;
+          }
+      
+          setPaymentData(data.paymentData);
+          setPaymentURL(url || "");
+          setShowModal(true);
+        }
+      );
+      
     } catch (err: any) {
       console.error("Payment error:", err);
       setPaymentError("Failed to process payment. Please try again.");
@@ -262,7 +279,7 @@ const HomePage: React.FC = () => {
                 {/* QR Code */}
                 <div className="flex justify-center">
                   <img
-                    src={paymentData.walletAddress}
+                    src={paymentURL}
                     alt="QR Code for Wallet Address"
                     className="w-32 h-32"
                   />
