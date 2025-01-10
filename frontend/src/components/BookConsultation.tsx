@@ -26,7 +26,7 @@ const BookConsultation: React.FC = () => {
         },
         {
           headers: {
-            "Authorization": `Bearer YOUR_ACCESS_TOKEN`, // Replace with a valid token
+            "Authorization": `Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiJmaXJzYSIsImV4cCI6MTc2ODA0NDgwMH0.saIjnJQPtNxGopy-cLuTKfotHLnDd8J33DEDiOyc2r0`, // Replace with a valid token
             "Content-Type": "application/json",
           },
         }
@@ -35,7 +35,7 @@ const BookConsultation: React.FC = () => {
       if (response.status === 200) {
         setSuccessMessage("Reservation created successfully!");
         setTimeout(() => {
-          navigate("/Home"); // Redirect to homepage after 2 seconds
+          navigate("/home"); // Redirect to homepage after 2 seconds
         }, 2000); // Adjust delay as needed
       }
     } catch (err: any) {

@@ -32,7 +32,7 @@ class ReservationResponse(BaseModel):
 # The external API endpoint
 EXTERNAL_API_URL = "https://coworkingspace.up.railway.app/api/secure/reservations"
 EXTERNAL_API_KEY = "fbc95f8588c50901aa95b850268b5d1632ca318768034fd7f72a50c57a4af785"
-EXTERNAL_AUTH_TOKEN = "Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiJmaXJzYSIsImV4cCI6MTczNjUwMjY3Mn0.erl6sJt46TxtlqCg7wgoah7zAfNo10g5g5nIvCOhfQ0"
+EXTERNAL_AUTH_TOKEN = "Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiJmaXJzYSIsImV4cCI6MTc2ODA0NDgwMH0.saIjnJQPtNxGopy-cLuTKfotHLnDd8J33DEDiOyc2r0"
 
 
 
