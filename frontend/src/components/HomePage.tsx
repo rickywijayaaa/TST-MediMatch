@@ -16,6 +16,8 @@ const HomePage: React.FC = () => {
   const [results, setResults] = useState<DrugResult[]>([]);
   const [error, setError] = useState<string>("");
   const [isLoading, setIsLoading] = useState<boolean>(false);
+  const [paymentError, setPaymentError] = useState<string>(""); // For payment errors
+  const [isPaying, setIsPaying] = useState<boolean>(false); // For payment loading
 
   const navigate = useNavigate(); // Initialize the navigate function
 
@@ -69,8 +71,36 @@ const HomePage: React.FC = () => {
     }
   };
 
+  const handlePay = async (medicine: string) => {
+    setPaymentError("");
+    setIsPaying(true);
+
+    try {
+      const response = await axios.post(
+        "https://api-staging.solstra.fi/service/pay/create",
+        {
+          currency: "SOL",
+          amount: 0.03, // Replace with actual amount logic if necessary
+        },
+        {
+          headers: {
+            "x-api-key": "304a903d-b8a3-4944-832b-153de7d954b2", // Your API Key
+            "Content-Type": "application/json",
+          },
+        }
+      );
+
+      alert(`Payment successful! Transaction ID: ${response.data?.data?.transactionId}`);
+    } catch (err: any) {
+      console.error("Payment error:", err);
+      setPaymentError("Failed to process payment. Please try again.");
+    } finally {
+      setIsPaying(false);
+    }
+  };
+
   const handleDeveloperModeClick = () => {
-    navigate("/generate-api"); // Navigate to the GenerateApi page
+    navigate("/generate-api"); // Navigate to GenerateApi page
   };
 
   return (
@@ -103,7 +133,7 @@ const HomePage: React.FC = () => {
                   className="text-gray-800 hover:text-primary flex items-center"
                 >
                   <span className="material-icons-outlined mr-2">
-                    Find Place
+                    Book Consultation
                   </span>
                 </a>
               </li>
@@ -183,10 +213,19 @@ const HomePage: React.FC = () => {
               {results.map((result) => (
                 <li
                   key={result.id}
-                  className="text-gray-900 py-4 border-b last:border-b-0"
+                  className="text-gray-900 py-4 border-b last:border-b-0 flex justify-between items-center"
                 >
-                  <p className="font-bold">{result.medicine}</p>
-                  <p className="text-gray-600">{result.composition}</p>
+                  <div>
+                    <p className="font-bold">{result.medicine}</p>
+                    <p className="text-gray-600">{result.composition}</p>
+                  </div>
+                  <button
+                    onClick={() => handlePay(result.medicine)}
+                    className="bg-primary text-white py-1 px-3 rounded-lg hover:bg-red-600 transition duration-300 disabled:opacity-50"
+                    disabled={isPaying}
+                  >
+                    {isPaying ? "Paying..." : "Pay"}
+                  </button>
                 </li>
               ))}
             </ul>
@@ -200,6 +239,13 @@ const HomePage: React.FC = () => {
             )
           )}
         </div>
+
+        {/* Payment Error Message */}
+        {paymentError && (
+          <p className="text-red-500 text-center mt-4 p-4 bg-red-50 rounded-lg">
+            {paymentError}
+          </p>
+        )}
       </div>
     </div>
   );

@@ -10,6 +10,8 @@ import os
 from supabase import create_client, Client
 from fastapi import Header, HTTPException, Request
 import secrets
+import httpx
+
 
 app = FastAPI()
 
@@ -146,6 +148,45 @@ async def recommend_medicines(
         print(f"Error: {e}")
         raise HTTPException(status_code=500, detail="Internal Server Error")
 
+
+# Define the payment endpoint
+@app.post("/payment")
+async def create_payment():
+    try:
+        # Define the payload and headers
+        payload = {
+            "currency": "SOL",
+            "amount": 0.03,
+        }
+        headers = {
+            "x-api-key": "5fcd48e0-c8b2-455f-ba5e-2f41a9b3e534",  # API Key
+        }
+
+        # Call the external API
+        async with httpx.AsyncClient() as client:
+            response = await client.post(
+                "https://api-staging.solstra.fi/service/pay/create",
+                json=payload,
+                headers=headers,
+            )
+
+        # Handle response errors
+        if response.status_code != 200:
+            raise HTTPException(
+                status_code=response.status_code,
+                detail=f"Error from external API: {response.json()}",
+            )
+
+        # Return the response to the client
+        return {
+            "status": response.json().get("status"),
+            "message": response.json().get("message"),
+            "paymentData": response.json().get("data"),
+        }
+
+    except Exception as e:
+        # Handle errors
+        raise HTTPException(status_code=500, detail=f"Failed to create payment: {str(e)}")
 
 
 @app.get("/")
