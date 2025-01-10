@@ -304,14 +304,6 @@ const HomePage: React.FC = () => {
                     {new Date(paymentData.expireAt).toLocaleString()}
                   </p>
                   <p>
-                    <a
-                      href={paymentData.checkPaid}
-                      target="_blank"
-                      rel="noopener noreferrer"
-                      className="text-blue-500 underline"
-                    >
-                      Check Payment Status
-                    </a>
                   </p>
                 </div>
               </div>
