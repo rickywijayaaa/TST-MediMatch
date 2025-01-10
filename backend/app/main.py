@@ -8,6 +8,7 @@ from typing import Optional
 from app.predict import predict_alternative_medicine
 import os
 from supabase import create_client, Client
+from fastapi import Header, HTTPException, Request
 import secrets
 
 app = FastAPI()
@@ -97,14 +98,37 @@ class MedicineRequest(BaseModel):
     drug_name: str
     top_n: int = 5
 
+
+
 @app.post("/recommend")
-async def recommend_medicines(request: MedicineRequest):
+async def recommend_medicines(
+    request: Request,  # Use the Request object to access headers
+    body: MedicineRequest,  # The payload body remains a Pydantic model
+    api_key: Optional[str] = Header(None),  # Capture the API key from the X-API-Key header
+):
     """
     Recommend alternative medicines based on the given drug name and top N results.
+    API key required for external developers but not for Medimatch users.
     """
     try:
+        # Check if the request is from your Medimatch web app (bypass API key validation)
+        referer = request.headers.get("Referer", "")
+        if "medimatch.web.id" in referer:
+            print("Request from Medimatch web app, bypassing API key validation.")
+        else:
+            # Validate API key
+            if not api_key:
+                raise HTTPException(status_code=403, detail="Missing API key")
+
+            # Query Supabase to validate the API key
+            response = supabase.table("api_keys").select("*").eq("api_key", api_key).execute()
+            if not response.data:
+                raise HTTPException(status_code=403, detail="Invalid API key")
+
+            print(f"Valid API key: {api_key}")
+
         # Call the prediction function
-        recommendations = predict_alternative_medicine(request.drug_name, request.top_n)
+        recommendations = predict_alternative_medicine(body.drug_name, body.top_n)
 
         # Handle case where no recommendations are found
         if isinstance(recommendations, str):
@@ -116,9 +140,13 @@ async def recommend_medicines(request: MedicineRequest):
         # Return successful response
         return {"success": True, "data": recommendations}
 
+    except HTTPException as e:
+        raise e
     except Exception as e:
         print(f"Error: {e}")
         raise HTTPException(status_code=500, detail="Internal Server Error")
+
+
 
 @app.get("/")
 async def health_check():
